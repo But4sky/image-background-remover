@@ -1,5 +1,5 @@
 export default {
-  async fetch(request, env, ctx) {
+  async fetch(request: any, env: any, ctx: any) {
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
       return new Response(null, {
