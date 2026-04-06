@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# RemoveBG Mini
 
-## Getting Started
+智能图片背景移除工具，基于 Next.js + Tailwind CSS + Cloudflare Edge 构建。
 
-First, run the development server:
+## 技术架构
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+┌─────────────┐     ┌─────────────────┐     ┌─────────────┐
+│   用户前端   │ --> │  Cloudflare Worker │ --> │  Remove.bg  │
+│ (Cloudflare │     │   (API 处理)      │     │    API      │
+│   Pages)    │     └─────────────────┘     └─────────────┘
+└─────────────┘
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 快速开始
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 本地开发
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# 安装依赖
+npm install
 
-## Learn More
+# 复制环境变量配置
+cp .env.local.example .env.local
+# 编辑 .env.local，填入你的 Remove.bg API Key
+vim .env.local
 
-To learn more about Next.js, take a look at the following resources:
+# 启动开发服务器
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Cloudflare Pages 部署
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+#### 1. 部署 API Worker
 
-## Deploy on Vercel
+```bash
+cd worker
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# 安装依赖
+npm install
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+# 本地测试
+npm run dev
+
+# 部署到 Cloudflare
+npm run deploy
+```
+
+部署后你会获得 Worker URL，例如：`https://remove-bg-worker.你的账号.workers.dev`
+
+#### 2. 配置环境变量
+
+在 Cloudflare Dashboard 中为 Worker 设置环境变量：
+- `REMOVE_BG_API_KEY`: 你的 Remove.bg API Key
+
+#### 3. 部署前端
+
+连接 GitHub 实现自动化部署：
+1. 进入 [Cloudflare Dashboard](https://dash.cloudflare.com/)
+2. Workers & Pages → 创建应用程序 → Pages → 连接 GitHub
+3. 选择本仓库
+4. 设置构建命令：`npm run pages:build`
+5. 设置输出目录：`.vercel/output/static`
+6. 添加环境变量：`NEXT_PUBLIC_API_URL` = 你的 Worker URL
+
+## 环境变量
+
+| 变量名 | 说明 | Worker / Pages |
+|--------|------|-----------------|
+| `REMOVE_BG_API_KEY` | Remove.bg API Key | Worker |
+| `NEXT_PUBLIC_API_URL` | Worker 访问地址 | Pages |
+
+## 功能
+
+- ✅ 图片拖拽/点击上传
+- ✅ JPG/PNG/WebP 支持，≤10MB
+- ✅ 移除背景（调用 Remove.bg API）
+- ✅ 原图/结果图对比预览
+- ✅ 一键下载 PNG
+- ✅ 错误处理
+
+## License
+
+MIT
